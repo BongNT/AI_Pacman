@@ -69,7 +69,7 @@ class ReflexAgent(Agent):
         successorGameState = currentGameState.generatePacmanSuccessor(action)
         newPos = successorGameState.getPacmanPosition()
         pos = currentGameState.getPacmanPosition()
-        newFood = successorGameState.getFood().asList()
+        newFood = currentGameState.getFood().asList()
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
         capsuales = currentGameState.getCapsules()
@@ -80,31 +80,38 @@ class ReflexAgent(Agent):
         scoreCollisionGhost = float("-inf")
         scoreEatCapsuale = 150
         scoreEatGhost = 50
+        print(pos, newPos )
+        print(newPos)
+        print("new",successorGameState.getFood())
+        print("old", currentGameState.getFood())
         if action == Directions.STOP:
+            #print("stop")
             scoreEvaluation += -110
         if pos not in capsuales and newPos in capsuales:
-             scoreEvaluation += scoreEatCapsuale
-        minFood = float("inf")
-        for food in newFood:
-            minFood = min(minFood, manhattanDistance(food, newPos))
-        print(food,newPos)
+            #print("eat capsuale")
+            scoreEvaluation += scoreEatCapsuale
 
-        print(manhattanDistance(food, newPos))
-        if minFood == float("inf"):
-            return float("inf")
-        else:
-
-            scoreEvaluation += (scoreEatFood / minFood)
-        cnt = 0
         for newGhostState in newGhostStates:
-            cnt += 1
-            #print("ghost ", cnt, newGhostState)
             ghostPosition = newGhostState.getPosition()
+            #print(ghostPosition)
             if (manhattanDistance(newPos, ghostPosition) < 2):
                 if newGhostState.scaredTimer > 0:
                     scoreEvaluation += scoreEatGhost
                 else:
                     return scoreCollisionGhost
+
+        minFood = float("inf")
+        for food in newFood:
+            minFood = min(minFood, manhattanDistance(food, newPos))
+            #print("food",food,newPos)
+        #print("min", minFood)
+
+        if minFood == 0:
+            return float("inf")
+        else:
+            scoreEvaluation += (scoreEatFood / minFood)
+
+
 
         return scoreEvaluation + currentGameState.getScore()
 
