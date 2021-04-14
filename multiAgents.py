@@ -80,10 +80,6 @@ class ReflexAgent(Agent):
         scoreCollisionGhost = float("-inf")
         scoreEatCapsuale = 150
         scoreEatGhost = 50
-        print(pos, newPos )
-        print(newPos)
-        print("new",successorGameState.getFood())
-        print("old", currentGameState.getFood())
         if action == Directions.STOP:
             #print("stop")
             scoreEvaluation += -110
@@ -93,7 +89,6 @@ class ReflexAgent(Agent):
 
         for newGhostState in newGhostStates:
             ghostPosition = newGhostState.getPosition()
-            #print(ghostPosition)
             if (manhattanDistance(newPos, ghostPosition) < 2):
                 if newGhostState.scaredTimer > 0:
                     scoreEvaluation += scoreEatGhost
@@ -174,7 +169,33 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
+
+        return self.minimax(self.depth * gameState.getNumAgents(), 0, gameState)[0]
         util.raiseNotDefined()
+    def minimax(self, depth, agent, gameState):
+        '''
+        return bestvalue (action, bestEvaluation)
+        '''
+
+        numAgents = gameState.getNumAgents()
+        if depth ==0 or gameState.isWin() or gameState.isLose():
+            return (None, self.evaluationFunction(gameState))
+        if agent == 0:
+            maxval = (None, float("-inf"))
+            for action in gameState.getLegalActions(0):
+                val = (action, self.minimax(depth-1, (agent + 1) % numAgents, gameState.generateSuccessor(0, action))[1])
+
+                maxval = max(maxval, val, key=lambda val: val[1])
+            return maxval
+        else:
+            minval = (None,float("inf"))
+            for action in gameState.getLegalActions(agent):
+                val = (action, self.minimax(depth-1, (agent+1) % numAgents, gameState.generateSuccessor(agent, action))[1])
+                minval = min(minval, val, key=lambda val: val[1])
+            return minval
+
+
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
