@@ -28,6 +28,7 @@ class PerceptronModel(object):
         """
         "*** YOUR CODE HERE ***"
         return nn.DotProduct(x, self.get_weights())
+
     def get_prediction(self, x):
         """
         Calculates the predicted class for a single data point `x`.
@@ -36,6 +37,7 @@ class PerceptronModel(object):
         """
         "*** YOUR CODE HERE ***"
         return 1 if nn.as_scalar(self.run(x)) >= 0 else -1
+
     def train(self, dataset):
         """
         Train the perceptron until convergence.
@@ -59,7 +61,13 @@ class RegressionModel(object):
     def __init__(self):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
-
+        self.batch_size = 20
+        n = 200
+        m = 1
+        self.w1 = nn.Parameter(1, n)
+        self.w2 = nn.Parameter(n, m)
+        self.b1 = nn.Parameter(1, n)
+        self.b2 = nn.Parameter(1, m)
     def run(self, x):
         """
         Runs the model for a batch of examples.
@@ -70,6 +78,13 @@ class RegressionModel(object):
             A node with shape (batch_size x 1) containing predicted y-values
         """
         "*** YOUR CODE HERE ***"
+        # L = relu(x.w1 +b1).w2 +b2
+        loss = nn.Linear(x, self.w1)
+        loss = nn.AddBias(loss, self.b1)
+        loss = nn.ReLU(loss)
+        loss = nn.Linear(loss, self.w2)
+        loss = nn.AddBias(loss, self.b2)
+        return loss
 
     def get_loss(self, x, y):
         """
@@ -82,12 +97,27 @@ class RegressionModel(object):
         Returns: a loss node
         """
         "*** YOUR CODE HERE ***"
-
+        predict = self.run(x)
+        return nn.SquareLoss(predict, y)
     def train(self, dataset):
         """
         Trains the model.
         """
         "*** YOUR CODE HERE ***"
+        learning_rate = -0.05
+        total_data = 0
+        total_loss = 0
+        for x, y in dataset.iterate_forever(self.batch_size):
+            loss = self.get_loss(x, y)
+            grad_w1, grad_w2, grad_b1, grad_b2 = nn.gradients(loss,[self.w1, self.w2, self.b1, self.b2])
+            self.b1.update(grad_b1, learning_rate)
+            self.b2.update(grad_b2, learning_rate)
+            self.w1.update(grad_w1, learning_rate)
+            self.w2.update(grad_w2, learning_rate)
+            total_data += self.batch_size
+            total_loss += nn.as_scalar(loss) * self.batch_size
+            if(total_loss / total_data) <= 0.02:
+                break
 
 class DigitClassificationModel(object):
     """
