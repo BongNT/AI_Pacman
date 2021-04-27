@@ -62,12 +62,12 @@ class RegressionModel(object):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
         self.batch_size = 20
-        n = 200
-        m = 1
+        n = 150
+
         self.w1 = nn.Parameter(1, n)
-        self.w2 = nn.Parameter(n, m)
+        self.w2 = nn.Parameter(n, 1)
         self.b1 = nn.Parameter(1, n)
-        self.b2 = nn.Parameter(1, m)
+        self.b2 = nn.Parameter(1, 1)
     def run(self, x):
         """
         Runs the model for a batch of examples.
@@ -116,7 +116,7 @@ class RegressionModel(object):
             self.w2.update(grad_w2, learning_rate)
             total_data += self.batch_size
             total_loss += nn.as_scalar(loss) * self.batch_size
-            if(total_loss / total_data) <= 0.02:
+            if (total_loss / total_data) <= 0.02 :
                 break
 
 class DigitClassificationModel(object):
@@ -136,7 +136,17 @@ class DigitClassificationModel(object):
     def __init__(self):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
-
+        self.batch_size = 40
+        i = 784
+        n = 200
+        p = 150
+        z = 10
+        self.w1 = nn.Parameter(i, n)
+        self.w2 = nn.Parameter(n, p)
+        self.w3 = nn.Parameter(p, z)
+        self.b1 = nn.Parameter(1, n)
+        self.b2 = nn.Parameter(1, p)
+        self.b3 = nn.Parameter(1, z)
     def run(self, x):
         """
         Runs the model for a batch of examples.
@@ -153,6 +163,16 @@ class DigitClassificationModel(object):
         """
         "*** YOUR CODE HERE ***"
 
+        loss = nn.Linear(x, self.w1)
+        loss = nn.AddBias(loss, self.b1)
+        loss = nn.ReLU(loss)
+        loss = nn.Linear(loss, self.w2)
+        loss = nn.AddBias(loss, self.b2)
+        loss = nn.ReLU(loss)
+        loss = nn.Linear(loss, self.w3)
+        loss = nn.AddBias(loss, self.b3)
+        return loss
+
     def get_loss(self, x, y):
         """
         Computes the loss for a batch of examples.
@@ -167,12 +187,31 @@ class DigitClassificationModel(object):
         Returns: a loss node
         """
         "*** YOUR CODE HERE ***"
+        predict = self.run(x)
+        return nn.SoftmaxLoss(predict, y)
 
     def train(self, dataset):
         """
         Trains the model.
         """
         "*** YOUR CODE HERE ***"
+        learning_rate = -0.07
+        total_data = 0
+        total_loss = 0
+        cnt = 0
+        for x, y in dataset.iterate_forever(self.batch_size):
+            cnt +=1
+            loss = self.get_loss(x, y)
+            grad_w1, grad_w2, grad_w3, grad_b1, grad_b2, grad_b3 = nn.gradients(loss, [self.w1, self.w2, self.w3, self.b1, self.b2, self.b3])
+            self.b1.update(grad_b1, learning_rate)
+            self.b2.update(grad_b2, learning_rate)
+            self.b3.update(grad_b3, learning_rate)
+            self.w1.update(grad_w1, learning_rate)
+            self.w2.update(grad_w2, learning_rate)
+            self.w3.update(grad_w3, learning_rate)
+
+            if cnt % 100 == 0 and dataset.get_validation_accuracy() > 0.975 :
+                    break
 
 class LanguageIDModel(object):
     """

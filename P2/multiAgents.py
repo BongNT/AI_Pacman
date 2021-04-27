@@ -66,6 +66,13 @@ class ReflexAgent(Agent):
         to create a masterful evaluation function.
         """
         # Useful information you can extract from a GameState (pacman.py)
+        '''
+        đánh giá :
+        + hành động
+        + Khoảng cách với ghost
+        + đường đi đến food gần nhất và số food còn lại
+        + ăn capsuale 
+        '''
         successorGameState = currentGameState.generatePacmanSuccessor(action)
         newPos = successorGameState.getPacmanPosition()
         pos = currentGameState.getPacmanPosition()
@@ -171,7 +178,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         "*** YOUR CODE HERE ***"
 
         return self.minimax(gameState, self.depth * gameState.getNumAgents())[0]
-        util.raiseNotDefined()
+
     def minimax(self, gameState, depth, agent=0):
         '''
         return bestvalue (action, bestEvaluation) using minimax algorithm
@@ -290,6 +297,12 @@ def betterEvaluationFunction(currentGameState):
     DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
+    """
+    đánh giá:
+    + trạng thái game
+    + khoảng cách đến food và ghost gần nhất
+    + số lượng capsuale, food còn lại
+    """
     evaluationScore = currentGameState.getScore()
     pos = currentGameState.getPacmanPosition()
     foods = currentGameState.getFood().asList()
