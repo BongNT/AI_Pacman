@@ -273,13 +273,6 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
                 maxVal = max(maxVal, val, key= lambda val: val[1])
             return maxVal
         else:
-            # minVal = (None, float("inf"))
-            # for action in gameState.getLegalActions(agent):
-            #     val = (action, self.expectimax(gameState.generateSuccessor(agent, action), depth - 1, (agent + 1) % numAgent, alpha, beta)[1])
-            #     minVal = min(minVal, val, key=lambda val: val[1])
-            #     if minVal[1] < alpha:
-            #         return minVal
-            #     beta = min(beta, minVal[1])
             averageVal = 0
             percentage = 1 / len(gameState.getLegalActions(agent))
             for action in gameState.getLegalActions(agent):
