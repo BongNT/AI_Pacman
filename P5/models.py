@@ -162,7 +162,7 @@ class DigitClassificationModel(object):
                 (also called logits)
         """
         "*** YOUR CODE HERE ***"
-
+        # L = relu(relu(x.w1 + b1).w2 + b2).w3 + b3
         loss = nn.Linear(x, self.w1)
         loss = nn.AddBias(loss, self.b1)
         loss = nn.ReLU(loss)
@@ -196,8 +196,6 @@ class DigitClassificationModel(object):
         """
         "*** YOUR CODE HERE ***"
         learning_rate = -0.07
-        total_data = 0
-        total_loss = 0
         cnt = 0
         for x, y in dataset.iterate_forever(self.batch_size):
             cnt +=1
@@ -209,8 +207,8 @@ class DigitClassificationModel(object):
             self.w1.update(grad_w1, learning_rate)
             self.w2.update(grad_w2, learning_rate)
             self.w3.update(grad_w3, learning_rate)
-
-            if cnt % 100 == 0 and dataset.get_validation_accuracy() > 0.975 :
+            # giảm số lần kiểm tra điều kiện dừng để tăng tốc độ train
+            if cnt % 400 == 0 and dataset.get_validation_accuracy() > 0.975 :
                     break
 
 class LanguageIDModel(object):
